@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lesson • EasyAudio</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .back-link { margin-bottom: 12px; display:inline-block; color:#3182ce; }
+  </style>
+  </head>
+<body>
+  <div class="container">
+    <header>
+      <h1 id="lessonTitle">Lesson</h1>
+      <a class="back-link" href="index.html">← Back to EasyAudio</a>
+    </header>
+
+    <main>
+      <section class="practice-section" id="practiceSection">
+        <audio id="audioPlayer" controls></audio>
+        <div class="typing-round" id="typingRound">
+          <p id="practiceHeader">Round 1: Type what you hear</p>
+          <input id="typingInput" type="text" placeholder="Type here" />
+          <div class="form-actions">
+            <button id="checkTypingBtn">Check</button>
+            <button id="replayBtn" class="secondary">Replay</button>
+            <button id="nextPhraseBtn" class="secondary" style="display:none;">Next Phrase</button>
+          </div>
+          <div id="typingFeedback" class="feedback"></div>
+        </div>
+        <div class="bubble-round" id="bubbleRound" style="display:none;">
+          <p>Round 2: Tap words to reconstruct the sentence</p>
+          <div id="bubblePool" class="bubble-pool"></div>
+          <div id="bubbleResult" class="bubble-result"></div>
+          <div class="form-actions">
+            <button id="submitBubbleBtn">Enviar</button>
+            <button id="resetBubbleBtn" class="secondary">Reset</button>
+            <button id="showAnswerBtn" class="secondary">Resposta</button>
+            <button id="nextPhraseBtn2" class="secondary" style="display:none;">Next Phrase</button>
+          </div>
+          <div id="bubbleFeedback" class="feedback"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="lesson.js"></script>
+</body>
+</html>

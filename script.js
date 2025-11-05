@@ -188,7 +188,7 @@ class EasyAudioApp {
       </div>`).join('');
     list.querySelectorAll('.play-btn').forEach(b => b.addEventListener('click', e => this.playItem(e.target.getAttribute('data-id'))));
     list.querySelectorAll('.start-btn').forEach(b => b.addEventListener('click', e => this.startItem(e.target.getAttribute('data-id'))));
-    list.querySelectorAll('.delete-btn').forEach(b => b.addEventListener('click', e => this.deleteItem(e.target.getAttribute('data-id'))));
+    list.querySelectorAll('.delete-btn').forEach(b => b.addEventListener('click', e => this.deleteItemSecured(e.target.getAttribute('data-id'))));
   }
 
   renderLessons() {
@@ -219,9 +219,7 @@ class EasyAudioApp {
     }));
     list.querySelectorAll('.delete-lesson-btn').forEach(b => b.addEventListener('click', e => {
       const id = e.target.getAttribute('data-id');
-      this.lessons = this.lessons.filter(x=>x.id!==id);
-      this.saveLessons();
-      this.renderLessons();
+      this.deleteLessonSecured(id);
     }));
     list.querySelectorAll('.share-lesson-btn').forEach(b => b.addEventListener('click', e => {
       const id = e.target.getAttribute('data-id');
@@ -264,22 +262,9 @@ class EasyAudioApp {
   }
 
   startLesson(id) {
-    const l = this.lessons.find(x=>x.id===id); if (!l || !l.phrases.length) return;
-    this.currentLessonId = id;
-    this.currentId = null;
-    this.currentPhraseIndex = 0;
-    const tf = document.getElementById('typingFeedback');
-    const bf = document.getElementById('bubbleFeedback');
-    const inEl = document.getElementById('typingInput');
-    const next1 = document.getElementById('nextPhraseBtn');
-    const next2 = document.getElementById('nextPhraseBtn2');
-    tf.textContent=''; bf.textContent=''; inEl.value=''; next1.style.display='none'; next2.style.display='none';
-    const typing = document.getElementById('typingRound');
-    const bubbles = document.getElementById('bubbleRound');
-    typing.style.display='block'; bubbles.style.display='none';
-    const header = document.getElementById('practiceHeader');
-    header.textContent = `Round 1: Type what you hear (Phrase 1 of ${l.phrases.length})`;
-    this.playLessonPhrase(id, 0);
+    // Navigate to dedicated lesson page using local id
+    const basePath = location.pathname.replace(/index\.html?$/, '');
+    window.location.href = `${basePath}lesson.html?id=${encodeURIComponent(id)}`;
   }
 
   checkTyping() {
@@ -346,7 +331,14 @@ class EasyAudioApp {
   }
 
   deleteItem(id) { this.items = this.items.filter(d=>d.id!==id); this.saveItems(); this.renderItems(); }
-  clearAll() { if (!confirm('Delete all activities?')) return; this.items=[]; this.saveItems(); this.renderItems(); }
+  deleteItemSecured(id) { if (!this.checkDeletePassword()) { alert('Incorrect password.'); return; } this.deleteItem(id); }
+  deleteLessonSecured(id) {
+    if (!this.checkDeletePassword()) { alert('Incorrect password.'); return; }
+    this.lessons = this.lessons.filter(x=>x.id!==id);
+    this.saveLessons();
+    this.renderLessons();
+  }
+  clearAll() { if (!this.checkDeletePassword()) { alert('Incorrect password.'); return; } if (!confirm('Delete all activities?')) return; this.items=[]; this.saveItems(); this.renderItems(); }
 
   saveItems() { try { localStorage.setItem('audio_dictations', JSON.stringify(this.items)); } catch(_){} }
   loadItems() { try { const raw=localStorage.getItem('audio_dictations'); if(!raw) return []; const p=JSON.parse(raw); return Array.isArray(p)?p:[]; } catch(_) { return []; } }
@@ -359,6 +351,13 @@ class EasyAudioApp {
   escapeHtml(t){ return (t||'').replace(/[&<>"']/g,(m)=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
   readFileAsDataURL(file){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); }); }
 
+  checkDeletePassword() {
+    try {
+      const input = prompt('Enter password to delete:');
+      return input === '281194';
+    } catch(_) { return false; }
+  }
+
   // --- Share per-lesson (omit audio; use TTS on load) ---
   shareLessonFromId(lessonId) {
     const l = this.lessons.find(x=>x.id===lessonId);
@@ -368,16 +367,10 @@ class EasyAudioApp {
     if (!l.phrases.length) { status.textContent = 'Lesson has no phrases to share.'; status.className = 'feedback error'; return; }
     const payload = { version: 2, lesson: { title: l.title, phrases: l.phrases.map(p => ({ text: p.text })) } };
     const encoded = this.toUrlSafeBase64(JSON.stringify(payload));
-    const fullUrl = `${location.origin}${location.pathname}?lesson=${encoded}`;
-    status.textContent = 'Generating share link...'; status.className = 'feedback';
-    this.shortenUrl(fullUrl).then(short => {
-      out.value = short || fullUrl;
-      status.textContent = short ? 'Short link generated.' : 'Share link ready.';
-      status.className = 'feedback success';
-    }).catch(() => {
-      out.value = fullUrl;
-      status.textContent = 'Shortening failed. Using full link.'; status.className = 'feedback error';
-    });
+    const basePath = location.pathname.replace(/index\.html?$/, '');
+    const fullUrl = `${location.origin}${basePath}lesson.html?lesson=${encoded}`;
+    out.value = fullUrl;
+    status.textContent = 'Share link ready.'; status.className = 'feedback success';
   }
 
   tryLoadSharedLesson() {

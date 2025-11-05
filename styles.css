@@ -15,6 +15,8 @@ section { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2
 .form-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
 .form-row label { font-weight: 600; }
 .form-row input[type="text"], .form-row input[type="file"], input#typingInput { padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px; }
+/* Larger typing box on lesson page */
+.typing-round #typingInput { width: 100%; height: 56px; font-size: 18px; padding: 14px; }
 .form-actions { display: flex; gap: 8px; margin-top: 8px; }
 button { padding: 8px 14px; border: none; border-radius: 20px; cursor: pointer; font-weight: 600; background: #4c51bf; color: white; }
 button.secondary { background: #718096; }
