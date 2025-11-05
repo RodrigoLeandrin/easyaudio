@@ -14,49 +14,67 @@
         </header>
 
         <main>
-            <section class="builder-section">
-                <h2>Create Dictation Item</h2>
+            <nav class="tabs">
+                <button class="tab-btn" id="tabCreate" data-tab="create" aria-selected="true">Create Lesson</button>
+                <button class="tab-btn" id="tabLessons" data-tab="lessons">Lessons</button>
+            </nav>
+
+            <!-- Create Lesson (Builder) -->
+            <section class="builder-section" id="createTab">
+                <h2>Create Lesson</h2>
                 <div class="card">
                     <div class="form-row">
-                        <label for="sentenceInput">Target sentence</label>
-                        <input id="sentenceInput" type="text" placeholder="e.g., The quick brown fox jumps over the lazy dog" />
+                        <label for="lessonTitleInput">Lesson title</label>
+                        <input id="lessonTitleInput" type="text" placeholder="e.g., Animals, Unit 3, Week 1" />
                     </div>
                     <div class="form-row">
-                        <label for="audioInput">MP3 audio</label>
+                        <label for="sentenceInput">Phrase (target sentence)</label>
+                        <input id="sentenceInput" type="text" placeholder="e.g., The cat is on the mat" />
+                    </div>
+                    <div class="form-row">
+                        <label for="audioInput">MP3 audio for this phrase</label>
                         <input id="audioInput" type="file" accept="audio/mp3,audio/mpeg" />
                     </div>
                     <div class="form-actions">
-                        <button id="addItemBtn">Add Activity</button>
-                        <button id="clearAllBtn" class="secondary">Clear All</button>
+                        <button id="addPhraseBtn">Add Phrase</button>
+                        <button id="clearDraftBtn" class="secondary">Clear Draft</button>
+                    </div>
+                </div>
+                <div class="card" style="margin-top:12px;">
+                    <h3>Draft phrases</h3>
+                    <div id="draftList" class="items-list"></div>
+                    <div class="form-actions" style="margin-top:10px;">
+                        <button id="saveLessonBtn">Save Lesson</button>
                     </div>
                 </div>
             </section>
 
-            <section class="list-section">
-                <h2>Your Dictations</h2>
+            <!-- Lessons Tab -->
+            <section class="list-section" id="lessonsTab" style="display:none;">
+                <h2>Your Lessons</h2>
                 <div class="card" style="margin-bottom:12px;">
                     <div class="form-row">
                         <label for="shareLinkOutput">Share lesson link</label>
-                        <input id="shareLinkOutput" type="text" placeholder="Click 'Share Lesson' to generate a link" readonly />
+                        <input id="shareLinkOutput" type="text" placeholder="Click 'Share' on a lesson to generate a link" readonly />
                     </div>
                     <div class="form-actions">
-                        <button id="shareLessonBtn">Share Lesson</button>
                         <button id="copyShareBtn" class="secondary">Copy Link</button>
                     </div>
                     <p id="shareStatus" class="feedback" style="margin-top:6px;"></p>
                 </div>
-                <div id="itemsList" class="items-list"></div>
+                <div id="lessonsList" class="items-list"></div>
             </section>
 
             <section class="practice-section" id="practiceSection" style="display:none;">
                 <h2>Practice</h2>
                 <audio id="audioPlayer" controls></audio>
                 <div class="typing-round" id="typingRound">
-                    <p>Round 1: Type what you hear</p>
+                    <p id="practiceHeader">Round 1: Type what you hear</p>
                     <input id="typingInput" type="text" placeholder="Type here" />
                     <div class="form-actions">
                         <button id="checkTypingBtn">Check</button>
                         <button id="replayBtn" class="secondary">Replay</button>
+                        <button id="nextPhraseBtn" class="secondary" style="display:none;">Next Phrase</button>
                     </div>
                     <div id="typingFeedback" class="feedback"></div>
                 </div>
@@ -67,6 +85,7 @@
                     <div class="form-actions">
                         <button id="submitBubbleBtn">Submit</button>
                         <button id="resetBubbleBtn" class="secondary">Reset</button>
+                        <button id="nextPhraseBtn2" class="secondary" style="display:none;">Next Phrase</button>
                     </div>
                     <div id="bubbleFeedback" class="feedback"></div>
                 </div>

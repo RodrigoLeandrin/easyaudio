@@ -5,6 +5,11 @@ body { font-family: Segoe UI, Tahoma, sans-serif; background: #f6f8fb; color: #2
 header { background: #4c51bf; color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
 header h1 { margin: 0 0 6px; }
 
+/* Tabs */
+.tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+.tab-btn { background: #edf2f7; color: #2d3748; border: 1px solid #e2e8f0; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
+.tab-btn[aria-selected="true"] { background: #c3dafe; border-color: #a3bffa; }
+
 section { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 16px; }
 .card { background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; }
 .form-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
@@ -17,6 +22,8 @@ button.secondary { background: #718096; }
 .items-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
 .item-card { display: flex; justify-content: space-between; align-items: center; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; }
 .item-actions button { margin-left: 6px; }
+
+.item-sub { color:#718096; font-size:0.85rem; }
 
 .feedback { margin-top: 8px; font-weight: 600; }
 .feedback.success { color: #2f855a; }
