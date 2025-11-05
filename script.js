@@ -17,6 +17,15 @@ class EasyAudioApp {
     // Render lessons and draft on load
     this.renderDraft();
     this.renderLessons();
+
+    // Load Supabase config if available
+    this.supabase = null;
+    const url = localStorage.getItem('supabase_url') || '';
+    const key = localStorage.getItem('supabase_key') || '';
+    this.supabaseBucket = localStorage.getItem('supabase_bucket') || 'audio';
+    if (url && key && window.supabase?.createClient) {
+      try { this.supabase = window.supabase.createClient(url, key); } catch(_){}
+    }
   }
 
   bindEvents() {
@@ -50,6 +59,30 @@ class EasyAudioApp {
     nextBtn1?.addEventListener('click', () => this.nextPhrase());
     const nextBtn2 = document.getElementById('nextPhraseBtn2');
     nextBtn2?.addEventListener('click', () => this.nextPhrase());
+
+    // Supabase config
+    const saveSbBtn = document.getElementById('saveSupabaseConfigBtn');
+    saveSbBtn?.addEventListener('click', () => {
+      const urlEl = document.getElementById('supabaseUrlInput');
+      const keyEl = document.getElementById('supabaseKeyInput');
+      const bucketEl = document.getElementById('supabaseBucketInput');
+      const url = (urlEl?.value || '').trim();
+      const key = (keyEl?.value || '').trim();
+      const bucket = (bucketEl?.value || '').trim() || 'audio';
+      if (!url || !key) { alert('Enter both Supabase URL and anon key'); return; }
+      try {
+        localStorage.setItem('supabase_url', url);
+        localStorage.setItem('supabase_key', key);
+        localStorage.setItem('supabase_bucket', bucket);
+        if (window.supabase?.createClient) {
+          this.supabase = window.supabase.createClient(url, key);
+          this.supabaseBucket = bucket;
+          alert('Supabase configured. MP3s will upload to Storage bucket "audio".');
+        } else {
+          alert('Supabase client not available in this page.');
+        }
+      } catch(_) { alert('Could not save config'); }
+    });
   }
 
   bindShareEvents() {
@@ -107,9 +140,19 @@ class EasyAudioApp {
     const text = (sentenceEl?.value || '').trim();
     const file = audioEl?.files?.[0] || null;
     if (!text || !file) { alert('Provide both phrase text and MP3'); return; }
-    const base64 = await this.readFileAsDataURL(file);
+    let audioUrl = null;
+    if (this.supabase) {
+      const upStatus = document.getElementById('uploadStatus');
+      if (upStatus) { upStatus.textContent = 'Uploading to Supabase…'; }
+      audioUrl = await this.uploadToSupabase(file).catch((err)=>{
+        if (upStatus) { upStatus.textContent = 'Upload failed. Using local file.'; }
+        return null;
+      });
+      if (audioUrl && upStatus) { upStatus.textContent = 'Uploaded to Supabase.'; }
+    }
+    const base64 = audioUrl ? null : await this.readFileAsDataURL(file);
     this.draft.title = (titleEl?.value || '').trim();
-    this.draft.phrases.push({ text, audio: base64 });
+    this.draft.phrases.push({ text, audio: audioUrl || base64 });
     try { sentenceEl.value=''; audioEl.value=''; } catch(_){}
     this.renderDraft();
   }
@@ -351,6 +394,18 @@ class EasyAudioApp {
   escapeHtml(t){ return (t||'').replace(/[&<>"']/g,(m)=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
   readFileAsDataURL(file){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); }); }
 
+  async uploadToSupabase(file) {
+    if (!this.supabase) throw new Error('Supabase not configured');
+    const bucket = this.supabaseBucket || 'audio';
+    const ext = (file.name.split('.').pop() || 'mp3').toLowerCase();
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+    const path = `${new Date().toISOString().slice(0,10)}/${Date.now()}_${Math.random().toString(36).slice(2)}_${safeName}`;
+    const { error } = await this.supabase.storage.from(bucket).upload(path, file, { upsert: true, contentType: `audio/${ext}` });
+    if (error) throw error;
+    const { data } = this.supabase.storage.from(bucket).getPublicUrl(path);
+    return data.publicUrl;
+  }
+
   checkDeletePassword() {
     try {
       const input = prompt('Enter password to delete:');
@@ -365,7 +420,7 @@ class EasyAudioApp {
     const out = document.getElementById('shareLinkOutput');
     if (!l) { status.textContent = 'Select a lesson to share.'; status.className = 'feedback error'; return; }
     if (!l.phrases.length) { status.textContent = 'Lesson has no phrases to share.'; status.className = 'feedback error'; return; }
-    const payload = { version: 2, lesson: { title: l.title, phrases: l.phrases.map(p => ({ text: p.text })) } };
+    const payload = { version: 2, lesson: { title: l.title, phrases: l.phrases.map(p => ({ text: p.text, audio: (p.audio && /^https?:\/\//.test(p.audio)) ? p.audio : undefined })) } };
     const encoded = this.toUrlSafeBase64(JSON.stringify(payload));
     const basePath = location.pathname.replace(/index\.html?$/, '');
     const fullUrl = `${location.origin}${basePath}lesson.html?lesson=${encoded}`;
@@ -385,7 +440,7 @@ class EasyAudioApp {
         const newLesson = {
           id: Date.now().toString() + Math.random().toString(36).slice(2),
           title: data.lesson.title || 'Shared Lesson',
-          phrases: data.lesson.phrases.map(p => ({ text: p.text, audio: null })),
+          phrases: data.lesson.phrases.map(p => ({ text: p.text, audio: p.audio || null })),
           createdAt: new Date().toISOString()
         };
         this.lessons.push(newLesson);

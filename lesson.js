@@ -36,7 +36,7 @@ class LessonPage {
         if (data && data.lesson && Array.isArray(data.lesson.phrases)) {
           this.lesson = {
             title: data.lesson.title || 'Shared Lesson',
-            phrases: data.lesson.phrases.map(p => ({ text: p.text, audio: null }))
+            phrases: data.lesson.phrases.map(p => ({ text: p.text, audio: p.audio || null }))
           };
         } else if (Array.isArray(data.items)) {
           this.lesson = {

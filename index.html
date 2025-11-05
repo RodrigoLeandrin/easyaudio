@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EasyAudio - Dictation Practice</title>
     <link rel="stylesheet" href="styles.css" />
+    <!-- Supabase client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -22,6 +24,25 @@
             <!-- Create Lesson (Builder) -->
             <section class="builder-section" id="createTab">
                 <h2>Create Lesson</h2>
+                <div class="card" style="margin-bottom:12px;">
+                    <h3>Cloud Storage (Supabase)</h3>
+                    <div class="form-row">
+                        <label for="supabaseUrlInput">Supabase URL</label>
+                        <input id="supabaseUrlInput" type="text" placeholder="https://YOUR-PROJECT.supabase.co" />
+                    </div>
+                    <div class="form-row">
+                        <label for="supabaseKeyInput">Supabase Anon Key</label>
+                        <input id="supabaseKeyInput" type="text" placeholder="Paste anon key" />
+                    </div>
+                    <div class="form-row">
+                        <label for="supabaseBucketInput">Storage bucket name</label>
+                        <input id="supabaseBucketInput" type="text" placeholder="audio" />
+                    </div>
+                    <p class="item-sub">Create a public bucket named <code>audio</code> in Supabase Storage. We’ll upload MP3s there and use public URLs when sharing.</p>
+                    <div class="form-actions">
+                        <button id="saveSupabaseConfigBtn">Save Config</button>
+                    </div>
+                </div>
                 <div class="card">
                     <div class="form-row">
                         <label for="lessonTitleInput">Lesson title</label>
@@ -35,6 +56,7 @@
                         <label for="audioInput">MP3 audio for this phrase</label>
                         <input id="audioInput" type="file" accept="audio/mp3,audio/mpeg" />
                     </div>
+                    <p id="uploadStatus" class="item-sub"></p>
                     <div class="form-actions">
                         <button id="addPhraseBtn">Add Phrase</button>
                         <button id="clearDraftBtn" class="secondary">Clear Draft</button>
