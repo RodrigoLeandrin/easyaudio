@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EasyAudio - Dictation Practice</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>EasyAudio</h1>
+            <p>Upload an MP3 and target sentence. Type first; then assemble bubbles.</p>
+        </header>
+
+        <main>
+            <section class="builder-section">
+                <h2>Create Dictation Item</h2>
+                <div class="card">
+                    <div class="form-row">
+                        <label for="sentenceInput">Target sentence</label>
+                        <input id="sentenceInput" type="text" placeholder="e.g., The quick brown fox jumps over the lazy dog" />
+                    </div>
+                    <div class="form-row">
+                        <label for="audioInput">MP3 audio</label>
+                        <input id="audioInput" type="file" accept="audio/mp3,audio/mpeg" />
+                    </div>
+                    <div class="form-actions">
+                        <button id="addItemBtn">Add Activity</button>
+                        <button id="clearAllBtn" class="secondary">Clear All</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="list-section">
+                <h2>Your Dictations</h2>
+                <div class="card" style="margin-bottom:12px;">
+                    <div class="form-row">
+                        <label for="shareLinkOutput">Share lesson link</label>
+                        <input id="shareLinkOutput" type="text" placeholder="Click 'Share Lesson' to generate a link" readonly />
+                    </div>
+                    <div class="form-actions">
+                        <button id="shareLessonBtn">Share Lesson</button>
+                        <button id="copyShareBtn" class="secondary">Copy Link</button>
+                    </div>
+                    <p id="shareStatus" class="feedback" style="margin-top:6px;"></p>
+                </div>
+                <div id="itemsList" class="items-list"></div>
+            </section>
+
+            <section class="practice-section" id="practiceSection" style="display:none;">
+                <h2>Practice</h2>
+                <audio id="audioPlayer" controls></audio>
+                <div class="typing-round" id="typingRound">
+                    <p>Round 1: Type what you hear</p>
+                    <input id="typingInput" type="text" placeholder="Type here" />
+                    <div class="form-actions">
+                        <button id="checkTypingBtn">Check</button>
+                        <button id="replayBtn" class="secondary">Replay</button>
+                    </div>
+                    <div id="typingFeedback" class="feedback"></div>
+                </div>
+                <div class="bubble-round" id="bubbleRound" style="display:none;">
+                    <p>Round 2: Tap words to reconstruct the sentence</p>
+                    <div id="bubblePool" class="bubble-pool"></div>
+                    <div id="bubbleResult" class="bubble-result"></div>
+                    <div class="form-actions">
+                        <button id="submitBubbleBtn">Submit</button>
+                        <button id="resetBubbleBtn" class="secondary">Reset</button>
+                    </div>
+                    <div id="bubbleFeedback" class="feedback"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
